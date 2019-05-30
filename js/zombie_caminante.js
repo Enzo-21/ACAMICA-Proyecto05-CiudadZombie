@@ -36,7 +36,11 @@ ZombieCaminante.prototype.mover = function() {
   if ((this.y < this.rangoMov.desdeY) || (this.y > this.rangoMov.hastaY)) {
     this.y = this.rangoMov.desdeY + (this.rangoMov.hastaY - this.rangoMov.desdeY)/2;
   }
+
+  
 }
+
+
 
 /* El ataque lo toma de su prototipo Enemigo que ya implementa un metodo atacar
 haciendole perder 1 vida al jugador. Si se quiere modificar el valor de ataque

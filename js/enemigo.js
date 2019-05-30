@@ -22,12 +22,14 @@ var Enemigo = function (sprite, x, y, ancho, alto, velocidad, rangoMov) {
   this.velocidad = velocidad;
   this.rangoMov = rangoMov;
   this.atacando = false;
+  this.fuerza = 1
 }
 
 /* Por defecto, un enemigo sabe responder al mensaje de atacar
 sacando una vida al jugador.*/
 Enemigo.prototype.atacar = function (jugador) {
-  jugador.perderVidas(1);
+  jugador.perderVidas(this.fuerza);
+  this.fuerza = 0;
 }
 
 /* Este metodo sirve para no estar atacando continuamente al jugador. Solo va a
@@ -43,3 +45,4 @@ dejarDeAtacar para modificar la propiedad atacando*/
 Enemigo.prototype.dejarDeAtacar = function () {
   this.atacando = false;
 }
+

@@ -8,6 +8,16 @@ texto COMPLETAR que deben completarse segun lo indique la consigna.
 El objeto Juego contiene mucho codigo. Tomate tu tiempo para leerlo tranquilo
 y entender que es lo que hace en cada una de sus partes. */
 
+/* Objeto Rango movimiento para pasar por parámetro  */
+const rangoDeMovimiento = {
+  desdeX: 15,
+  hastaX: 855,
+  desdeY: 0,
+  hastaY: 470,
+}
+
+
+
 var Juego = {
   // Aca se configura el tamanio del canvas del juego
   anchoCanvas: 961,
@@ -16,6 +26,8 @@ var Juego = {
   vidasInicial: Jugador.vidas,
   // Indica si el jugador gano
   ganador: false,
+
+  
 
   obstaculosCarretera: [
     /*Aca se van a agregar los obstaculos visibles. Tenemos una valla horizontal
@@ -31,7 +43,7 @@ var Juego = {
     /* AUTOS */
     new Obstaculo('imagenes/auto_verde_derecha.png', 330, 80, 30, 15, 1),
     new Obstaculo('imagenes/auto_verde_derecha.png', 530, 410, 30, 15, 1),
-    new Obstaculo('imagenes/auto_verde_abajo.png', 230, 450, 15, 30, 1),
+    new Obstaculo('imagenes/auto_verde_abajo.png', 230, 480, 15, 30, 1),
 
     /* BACHES */
     new Obstaculo('imagenes/bache.png', 240, 380, 30, 30, 1),
@@ -49,18 +61,30 @@ var Juego = {
     new Obstaculo('', 0, 5, 18, 572, 0),
     new Obstaculo('', 943, 5, 18, 572, 0),
     // Veredas
-    new Obstaculo('', 18, 23, 51, 536, 2),
-    new Obstaculo('', 69, 507, 690, 52, 2),
-    new Obstaculo('', 587, 147, 173, 360, 2),
-    new Obstaculo('', 346, 147, 241, 52, 2),
-    new Obstaculo('', 196, 267, 263, 112, 2),
-    new Obstaculo('', 196, 23, 83, 244, 2),
-    new Obstaculo('', 279, 23, 664, 56, 2),
-    new Obstaculo('', 887, 79, 56, 480, 2)
+    new Obstaculo('', 18, 23, 51, 536, 1),
+    new Obstaculo('', 69, 507, 690, 52, 1),
+    new Obstaculo('', 587, 147, 173, 360, 1),
+    new Obstaculo('', 346, 147, 241, 52, 1),
+    new Obstaculo('', 196, 267, 263, 112, 1),
+    new Obstaculo('', 196, 23, 83, 244, 1),
+    new Obstaculo('', 279, 23, 664, 56, 1),
+    new Obstaculo('', 887, 79, 56, 480, 1)
   ],
   // Los enemigos se agregaran en este arreglo.
   enemigos: [
-    new ZombieCaminante('imagenes/zombie1.png', 300, 100, 15, 15, 1,1000),
+    new ZombieCaminante('imagenes/zombie1.png', 300, 100, 15, 15, 0.5, rangoDeMovimiento ),
+    new ZombieCaminante('imagenes/zombie2.png', 200, 200, 15, 15, 0.3,rangoDeMovimiento),
+    new ZombieCaminante('imagenes/zombie3.png', 600, 300, 15, 15, 0.4,rangoDeMovimiento),
+    new ZombieCaminante('imagenes/zombie4.png', 300, 400, 15, 15, 0.5,rangoDeMovimiento),
+    new ZombieCaminante('imagenes/zombie1.png', 400, 100, 15, 15, 0.9,rangoDeMovimiento),
+    new ZombieCaminante('imagenes/zombie2.png', 500, 50, 15, 15, 0.6,rangoDeMovimiento),
+    new ZombieCaminante('imagenes/zombie3.png', 600, 10, 15, 15, 0.3,rangoDeMovimiento),
+    new ZombieCaminante('imagenes/zombie4.png', 700, 500, 15, 15, 0.7,rangoDeMovimiento),
+
+    new ZombieConductor('imagenes/tren_horizontal.png', 800, 325, 90, 30, 4, rangoDeMovimiento, 'h'),
+    new ZombieConductor('imagenes/tren_vertical.png', 644, 0, 30, 90, 2.5, rangoDeMovimiento, 'v'),
+    new ZombieConductor('imagenes/tren_vertical.png', 674, 0, 30, 90, 1, rangoDeMovimiento, 'v'),
+
   ]
 
 }
@@ -73,6 +97,8 @@ Juego.iniciarRecursos = function() {
   Resources.load([
     'imagenes/mapa.png',
     'imagenes/mensaje_gameover.png',
+    'imagenes/Mensaje1.png',
+    'imagenes/Mensaje2.png',
     'imagenes/Splash.png',
     'imagenes/bache.png',
     'imagenes/tren_horizontal.png',
@@ -166,6 +192,7 @@ Juego.dibujar = function() {
   /* Completar */
   Dibujante.dibujarEntidad(Jugador);
 
+
   // Se recorren los obstaculos de la carretera pintandolos
   this.obstaculosCarretera.forEach(function(obstaculo) {
     Dibujante.dibujarEntidad(obstaculo);
@@ -188,6 +215,10 @@ Juego.dibujar = function() {
 
 
 
+
+
+
+
 /* Recorre los enemigos haciendo que se muevan. De la misma forma que hicimos
 un recorrido por los enemigos para dibujarlos en pantalla ahora habra que hacer
 una funcionalidad similar pero para que se muevan.*/
@@ -207,9 +238,12 @@ Juego.calcularAtaques = function() {
     if (this.intersecan(enemigo, this.jugador, this.jugador.x, this.jugador.y)) {
       /* Si el enemigo colisiona debe empezar su ataque
       COMPLETAR */
+     enemigo.comenzarAtaque(this.jugador)
     } else {
       /* Sino, debe dejar de atacar
       COMPLETAR */
+      enemigo.dejarDeAtacar();
+    
     }
   }, this);
 };
@@ -224,6 +258,8 @@ Juego.chequearColisiones = function(x, y) {
     if (this.intersecan(obstaculo, this.jugador, x, y)) {
 
       /*COMPLETAR, obstaculo debe chocar al jugador*/
+      this.jugador.vidas -= obstaculo.potencia;
+      obstaculo.potencia = 0;
 
       puedeMoverse = false
     }
@@ -252,16 +288,27 @@ Juego.dibujarFondo = function() {
   if (this.terminoJuego()) {
     Dibujante.dibujarImagen('imagenes/mensaje_gameover.png', 0, 5, this.anchoCanvas, this.altoCanvas);
     document.getElementById('reiniciar').style.visibility = 'visible';
+    Juego.obstaculosCarretera = []
+    Juego.enemigos = []
+    Jugador = [];
   }
 
   // Si se gano el juego hay que mostrar el mensaje de ganoJuego de fondo
   else if (this.ganoJuego()) {
     Dibujante.dibujarImagen('imagenes/Splash.png', 190, 113, 500, 203);
     document.getElementById('reiniciar').style.visibility = 'visible';
+    document.getElementById('ganaste').style.display = 'block';
+    Juego.obstaculosCarretera = []
+    Juego.enemigos = []
+    Jugador = [];
+
   } else {
     Dibujante.dibujarImagen('imagenes/mapa.png', 0, 5, this.anchoCanvas, this.altoCanvas);
+    
   }
 };
+
+
 
 Juego.terminoJuego = function() {
   return this.jugador.vidas <= 0;
@@ -286,5 +333,4 @@ document.addEventListener('keydown', function(e) {
 
   Juego.capturarMovimiento(allowedKeys[e.keyCode]);
 });
-
 
